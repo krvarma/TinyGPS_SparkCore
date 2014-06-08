@@ -1,0 +1,7 @@
+{
+	"name": "TinyGPS",
+	"author": "Krishnaraj Varma",
+	"version": "1.0.0",
+	"license": "GNU Lesser General Public License",
+	"description": "TinyGPS (by Mikal Hart) for Spark Core library"
+} 

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spark Core Location</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+        html, body
+        {
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        h1
+        {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #map-canvas
+        {
+            width: 80%;
+            height: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script>
+        var map;
+		var marker;
+		var loc;
+        function initialize() {
+            var mapOptions = {
+                zoom: 18,
+                minZoom: 10,
+                maxZoom: 18,
+                draggable: false,
+                disableDefaultUI: true,
+                center: new google.maps.LatLng(0.0, 0.0)
+            };
+            map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+			
+			marker = new google.maps.Marker({position: new google.maps.LatLng(0.0, 0.0), map: map});
+			
+			marker.setMap(map);
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+		
+		function start() {
+			var deviceID = "<<devideid>>";
+			var accessToken = "<<accesstoken>>";
+			var eventSource = new EventSource("https://api.spark.io/v1/devices/" + deviceID + "/events/?access_token=" + accessToken);
+
+			eventSource.addEventListener('open', function(e) {
+				console.log("Opened!"); },false);
+
+			eventSource.addEventListener('error', function(e) {
+				console.log("Errored!"); },false);
+
+			eventSource.addEventListener('gpsloc', function(e) {
+				var parsedData = JSON.parse(e.data);
+				var data = parsedData.data.split(",");
+				
+				console.log( parsedData.data);
+				console.log(data[0]);
+				console.log(data[1]);
+				
+				loc = new google.maps.LatLng(data[0], data[1]);
+				
+				marker.setMap(null);
+				
+				marker = new google.maps.Marker({position: loc, map: map});
+				
+				marker.setMap(null);
+				map.panTo(loc);
+				marker.setMap(map);
+				
+			}, false);
+		}
+
+		window.onload=start;
+    </script>
+</head>
+<body>
+    <h1>Spark Location</h1>
+    <div id="map-canvas">
+    </div>
+</body>
+</html>
